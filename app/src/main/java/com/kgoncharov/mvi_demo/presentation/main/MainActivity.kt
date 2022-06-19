@@ -1,8 +1,9 @@
-package com.kgoncharov.mvi_demo
+package com.kgoncharov.mvi_demo.presentation.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import com.kgoncharov.mvi_demo.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
