@@ -10,6 +10,7 @@ import com.kgoncharov.mvi_demo.presentation.base.Screen
 import com.kgoncharov.mvi_demo.presentation.main.taskslist.TasksAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), Screen<MainScreenState> {
@@ -37,13 +38,13 @@ class MainActivity : AppCompatActivity(), Screen<MainScreenState> {
         progressTasks.isVisible = state.isLoading
         recyclerViewTasks.isVisible = !state.isLoading
         buttonTasksAdd.isVisible = !state.isLoading
-        if (adapter.itemCount != state.data.size) adapter.submitList(state.data)
+        adapter.submitList(state.data)
         if (state.isAddDialogShowing) {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle("Add item")
                 .setMessage("Do you want to add item to list?")
                 .setPositiveButton("Yes") { _, _ ->
-                    viewModel.addItem("New task")
+                    viewModel.addItem("New task ${Random.nextInt()}")
                 }
                 .setNegativeButton("No") { _, _ ->
                     viewModel.changeAddDialogState(isVisible = false)
