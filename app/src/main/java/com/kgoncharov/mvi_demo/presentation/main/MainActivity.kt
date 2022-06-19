@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), Screen<MainScreenState> {
         progressTasks.isVisible = state.isLoading
         recyclerViewTasks.isVisible = !state.isLoading
         buttonTasksAdd.isVisible = !state.isLoading
-        adapter.submitList(state.data)
+        if (adapter.itemCount != state.data.size) adapter.submitList(state.data)
         if (state.isAddDialogShowing) {
             AlertDialog.Builder(this@MainActivity)
                 .setTitle("Add item")
