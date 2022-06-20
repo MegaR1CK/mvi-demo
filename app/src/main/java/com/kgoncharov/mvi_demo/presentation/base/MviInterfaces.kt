@@ -4,4 +4,4 @@ interface UiState
 
 interface UiEffect
 
-interface UiEvent
+interface UiIntent

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.kgoncharov.mvi_demo.domain.GetTasksUseCase
 import com.kgoncharov.mvi_demo.presentation.base.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,9 +19,11 @@ class MainViewModel @Inject constructor(
     private val mainScreenStore: MainScreenStore
 ) : ViewModel() {
 
+    private var effectsCollectJob: Job? = null
+
     init {
         viewModelScope.launch {
-            sendEvent(MainScreenEvent.ShowData(getTasksUseCase.execute()))
+            sendIntent(MainScreenIntent.ShowData(getTasksUseCase.execute()))
         }
     }
 
@@ -28,21 +31,28 @@ class MainViewModel @Inject constructor(
         mainScreenStore.stateFlow.collect(screen::render)
     }
 
-    fun bindEffects(lifecycleOwner: LifecycleOwner, context: Context) = lifecycleOwner.lifecycleScope.launch {
-        mainScreenStore.effectsFlow.collect {
-            when (it) {
-                is MainScreenEffect.ShowToast -> Toast.makeText(context, it.text, Toast.LENGTH_LONG).show()
+    fun bindEffects(lifecycleOwner: LifecycleOwner, context: Context) {
+        effectsCollectJob = lifecycleOwner.lifecycleScope.launch {
+            mainScreenStore.effectsFlow.collect { effect ->
+                when (effect) {
+                    is MainScreenEffect.ShowToast -> Toast.makeText(context, effect.text, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
 
-    fun addItem(text: String) = sendEvent(MainScreenEvent.AddItem(text))
+    fun addItem(text: String) = sendIntent(MainScreenIntent.AddItem(text))
 
-    fun changeAddDialogState(isVisible: Boolean) = sendEvent(MainScreenEvent.OnChangeDialogState(isVisible))
+    fun changeAddDialogState(isVisible: Boolean) = sendIntent(MainScreenIntent.OnChangeDialogState(isVisible))
 
-    fun onItemCheckedChanged(index: Int, isChecked: Boolean) = sendEvent(MainScreenEvent.OnItemCheckedChanged(index, isChecked))
+    fun onItemCheckedChanged(index: Int, isChecked: Boolean) = sendIntent(MainScreenIntent.OnItemCheckedChanged(index, isChecked))
 
-    private fun sendEvent(event: MainScreenEvent) = viewModelScope.launch {
-        mainScreenStore.dispatch(event)
+    override fun onCleared() {
+        effectsCollectJob = null
+        super.onCleared()
+    }
+
+    private fun sendIntent(intent: MainScreenIntent) = viewModelScope.launch {
+        mainScreenStore.dispatch(intent)
     }
 }

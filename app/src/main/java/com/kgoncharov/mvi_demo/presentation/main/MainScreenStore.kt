@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Provider
+import javax.inject.Singleton
 
+@Singleton
 class MainScreenStore @Inject constructor(
     private val reducer: Provider<MainScreenReducer>,
-) : Store<MainScreenState, MainScreenEffect, MainScreenEvent> {
+) : Store<MainScreenState, MainScreenEffect, MainScreenIntent> {
 
     private val _effectsFlow = Channel<MainScreenEffect>(Channel.BUFFERED)
     override val effectsFlow: Flow<MainScreenEffect> = _effectsFlow.receiveAsFlow()
@@ -19,8 +21,8 @@ class MainScreenStore @Inject constructor(
     private val _stateFlow = MutableStateFlow(MainScreenState.initial())
     override val stateFlow: StateFlow<MainScreenState> = _stateFlow
 
-    override suspend fun dispatch(event: MainScreenEvent) {
-        _stateFlow.tryEmit(reducer.get().reduce(_stateFlow.value, event))
+    override suspend fun dispatch(intent: MainScreenIntent) {
+        _stateFlow.tryEmit(reducer.get().reduce(_stateFlow.value, intent))
     }
 
     override suspend fun effect(effect: MainScreenEffect) {
