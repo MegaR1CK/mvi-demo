@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.kgoncharov.mvi_demo.domain.GetTasksUseCase
-import com.kgoncharov.mvi_demo.presentation.base.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,14 +21,12 @@ class MainViewModel @Inject constructor(
 
     private var effectsCollectJob: Job? = null
 
+    val stateFlow: StateFlow<MainScreenState> = mainScreenStore.stateFlow
+
     init {
         viewModelScope.launch {
             sendIntent(MainScreenIntent.ShowData(getTasksUseCase.execute()))
         }
-    }
-
-    fun bindScreen(screen: Screen<MainScreenState>) = viewModelScope.launch {
-        mainScreenStore.stateFlow.collect(screen::render)
     }
 
     fun bindEffects(lifecycleOwner: LifecycleOwner, context: Context) {
