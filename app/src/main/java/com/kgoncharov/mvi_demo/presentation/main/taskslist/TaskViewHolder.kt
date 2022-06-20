@@ -9,8 +9,8 @@ class TaskViewHolder(private val binding: ItemTaskBinding) : RecyclerView.ViewHo
     fun bind(item: Task, onCheckedChanged: (Int, Boolean) -> Unit) = with(binding) {
         textViewTask.text = item.text
         checkboxTask.isChecked = item.isCompleted
-        checkboxTask.setOnCheckedChangeListener { _, isChecked ->
-            onCheckedChanged(adapterPosition, isChecked)
+        checkboxTask.setOnClickListener {
+            onCheckedChanged(adapterPosition, checkboxTask.isChecked)
         }
     }
 }

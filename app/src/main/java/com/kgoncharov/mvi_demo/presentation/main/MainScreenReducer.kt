@@ -6,21 +6,22 @@ import javax.inject.Inject
 
 class MainScreenReducer @Inject constructor(
     private val store: MainScreenStore
-) : Reducer<MainScreenState, MainScreenEvent> {
+) : Reducer<MainScreenState, MainScreenIntent> {
 
-    override suspend fun reduce(oldState: MainScreenState, event: MainScreenEvent) = when (event) {
-        is MainScreenEvent.ShowData -> oldState.copy(isLoading = false, data = event.items)
-        is MainScreenEvent.OnChangeDialogState -> oldState.copy(isAddDialogShowing = event.isShowing)
-        is MainScreenEvent.DismissDialog -> oldState.copy(isAddDialogShowing = false)
-        is MainScreenEvent.AddItem -> {
+    override suspend fun reduce(oldState: MainScreenState, intent: MainScreenIntent) = when (intent) {
+        is MainScreenIntent.ShowData -> oldState.copy(isLoading = false, data = intent.items)
+        is MainScreenIntent.OnChangeDialogState -> oldState.copy(isAddDialogShowing = intent.isShowing)
+        is MainScreenIntent.DismissDialog -> oldState.copy(isAddDialogShowing = false)
+        is MainScreenIntent.AddItem -> {
             val list = oldState.data.toMutableList().apply {
-                add(Task(text = event.text, isCompleted = false))
+                add(Task(text = intent.text, isCompleted = false))
             }
             oldState.copy(data = list, isAddDialogShowing = false)
         }
-        is MainScreenEvent.OnItemCheckedChanged -> {
+        is MainScreenIntent.OnItemCheckedChanged -> {
             val newList = oldState.data.toMutableList()
-            newList[event.index] = newList[event.index].copy(isCompleted = event.isChecked)
+            newList[intent.index] = newList[intent.index].copy(isCompleted = intent.isChecked)
+            store.effect(MainScreenEffect.ShowToast("position: ${intent.index}, isCompleted: ${intent.isChecked}"))
             oldState.copy(data = newList)
         }
     }

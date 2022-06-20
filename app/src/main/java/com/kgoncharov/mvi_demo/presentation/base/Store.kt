@@ -4,9 +4,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /** Store отвечает за хранение потоков стейтов и эффектов */
-interface Store<S : UiState, EF : UiEffect, EV : UiEvent> {
+interface Store<S : UiState, E : UiEffect, I : UiIntent> {
     val stateFlow: StateFlow<S>
-    val effectsFlow: Flow<EF>
-    suspend fun dispatch(event: EV)
-    suspend fun effect(effect: EF)
+    val effectsFlow: Flow<E>
+    suspend fun dispatch(intent: I)
+    suspend fun effect(effect: E)
 }
