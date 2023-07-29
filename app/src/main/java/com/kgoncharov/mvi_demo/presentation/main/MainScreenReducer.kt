@@ -1,7 +1,7 @@
 package com.kgoncharov.mvi_demo.presentation.main
 
-import com.kgoncharov.mvi_demo.data.Task
 import com.kgoncharov.mvi_demo.presentation.base.Reducer
+import com.kgoncharov.mvi_demo.presentation.main.taskslist.TasksListItem
 import javax.inject.Inject
 
 class MainScreenReducer @Inject constructor(
@@ -14,13 +14,18 @@ class MainScreenReducer @Inject constructor(
         is MainScreenIntent.DismissDialog -> oldState.copy(isAddDialogShowing = false)
         is MainScreenIntent.AddItem -> {
             val list = oldState.data.toMutableList().apply {
-                add(Task(text = intent.text, isCompleted = false))
+                add(
+                    index = size - 1,
+                    element = TasksListItem.TaskItem(text = intent.text, isCompleted = false)
+                )
             }
             oldState.copy(data = list, isAddDialogShowing = false)
         }
         is MainScreenIntent.OnItemCheckedChanged -> {
             val newList = oldState.data.toMutableList()
-            newList[intent.index] = newList[intent.index].copy(isCompleted = intent.isChecked)
+            (newList[intent.index] as? TasksListItem.TaskItem)?.let { item ->
+                newList[intent.index] = item.copy(isCompleted = intent.isChecked)
+            }
             store.effect(MainScreenEffect.ShowToast("position: ${intent.index}, isCompleted: ${intent.isChecked}"))
             oldState.copy(data = newList)
         }
